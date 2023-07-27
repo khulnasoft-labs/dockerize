@@ -1,0 +1,32 @@
+name: release-sbom
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref (e.g. v0.6.1)'
+        required: true
+        type: string
+      repo:
+        description: 'Override default repo'
+        required: false
+        type: string
+      release:
+        description: 'Push image and create release'
+        required: false
+        type: boolean
+
+jobs:
+  release:
+    uses: ./.github/workflows/.release.yml
+    with:
+      name: sbom
+      release: ${{ inputs.release }}
+      envs: |
+        SBOM_REPO=${{ inputs.repo }}
+        SBOM_REF=${{ inputs.ref }}
+    secrets: inherit
